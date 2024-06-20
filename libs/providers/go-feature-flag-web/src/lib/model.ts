@@ -50,6 +50,9 @@ export interface GoFeatureFlagWebProviderOptions {
   // maximum number of retries before considering GO Feature Flag is unreachable
   // Default: 10
   maxRetries?: number;
+
+  // optional callback to trigger after successful feature flag evaluation
+  listener?: (key: string, value: FlagValue) => void;
 }
 
 /**

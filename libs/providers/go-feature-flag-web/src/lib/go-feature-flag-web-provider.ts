@@ -38,6 +38,8 @@ export class GoFeatureFlagWebProvider implements Provider {
   private readonly _apiTimeout: number;
   // apiKey is the key used to identify your request in GO Feature Flag
   private readonly _apiKey: string | undefined;
+  // listener is an optional callback triggered after successful feature flag evaluation
+  private readonly _listener: ((key: string, value: FlagValue) => void) | undefined;
 
   // initial delay in millisecond to wait before retrying to connect
   private readonly _retryInitialDelay;
@@ -60,6 +62,7 @@ export class GoFeatureFlagWebProvider implements Provider {
     this._retryDelayMultiplier = options.retryDelayMultiplier || 2;
     this._maxRetries = options.maxRetries || 10;
     this._apiKey = options.apiKey;
+    this._listener = options.listener;
   }
 
   get status(): ProviderStatus {
@@ -223,6 +226,9 @@ export class GoFeatureFlagWebProvider implements Provider {
     if (typeof resolved.value !== type) {
       throw new TypeMismatchError(`flag key ${flagKey} is not of type ${type}`);
     }
+
+    this._listener?.(flagKey, resolved.value);
+
     return {
       variant: resolved.variant,
       value: resolved.value as T,
